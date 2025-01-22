@@ -5,8 +5,7 @@ class Piece:
     def __init__(self,name,color,value,texture=None,texture_rect=None):
         self.name = name
         self.color = color
-        value_sign = 1 if color =='white' else -1
-        self.value = value * value_sign
+        self.value = value 
         self.moves = []
         self.moved = False
         self.texture = texture
@@ -53,8 +52,7 @@ class Queen(Piece):
         super().__init__('queen',color,9.0)
 
 class King(Piece):
-    
-    def __init__(self,color):
-        super().__init__('king',color,math.inf)
+    def __init__(self, color):
+        super().__init__('king', color, 1000)  # Use a high finite value
         self.left_rook = None
         self.right_rook = None
