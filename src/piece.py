@@ -56,3 +56,5 @@ class King(Piece):
     
     def __init__(self,color):
         super().__init__('king',color,math.inf)
+        self.left_rook = None
+        self.right_rook = None
