@@ -1,7 +1,8 @@
 import pygame
 import sys
-
+from square import Square
 from const import *
+from move import Move
 from game import Game
 
 class Main:
@@ -12,9 +13,6 @@ class Main:
         pygame.display.set_caption('stockshrimp')
         self.game = Game()
         
-
-
-
     def mainloop(self):
 
         game = self.game
@@ -25,8 +23,12 @@ class Main:
 
         while True:
             game.show_bg(screen)
+            game.show_last_move(screen)
             game.show_moves(screen)
+            
             game.show_pieces(screen)
+
+            game.show_hover(screen)
 
             if dragger.dragging:
                 dragger.update_blit(screen)
@@ -43,30 +45,65 @@ class Main:
                     # if clicked square has a piece
                     if board.squares[clicked_row][clicked_col].has_piece():
                         piece = board.squares[clicked_row][clicked_col].piece
-                        board.calc_moves(piece,clicked_row,clicked_col)
+                        if piece.color == game.next_player:
+                            board.calc_moves(piece,clicked_row,clicked_col)
 
-                        dragger.save_inital(event.pos)
-                        dragger.drag_piece(piece)
-                        game.show_bg(screen)
-                        game.show_moves(screen)
-                        game.show_pieces(screen)
+                            dragger.save_inital(event.pos)
+                            dragger.drag_piece(piece)
+                            game.show_bg(screen)
+                            game.show_last_move(screen)
+                            game.show_moves(screen)
+                            game.show_pieces(screen)
 
                 # move mouse
                 elif event.type == pygame.MOUSEMOTION:
+                    motion_row = event.pos[1] // SQSIZE
+                    motion_col = event.pos[0] // SQSIZE
+
+                    game.set_hover(motion_row,motion_col)
 
                     if dragger.dragging:
                         dragger.update_mouse(event.pos)
                         game.show_bg(screen)
+                        game.show_last_move(screen)
                         game.show_moves(screen)
                         game.show_pieces(screen)
+                        game.show_hover(screen)
                         dragger.update_blit(screen)
+
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        game.reset()
+                        screen = self.screen
+                        game = self.game
+                        board = self.game.board
+                        dragger = self.game.dragger
+                    
 
 
 
                 # mouse unclicked
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    dragger.undrag_piece()
 
+                    if dragger.dragging:
+                        final_row = dragger.mouseY // SQSIZE
+                        final_col = dragger.mouseX // SQSIZE
+
+                        inital = Square(dragger.inital_row,dragger.inital_col)
+                        final = Square(final_row,final_col)
+
+                        move = Move(inital,final)
+
+                        if board.valid_move(dragger.piece,move):
+                            board.move(dragger.piece,move)
+                            game.show_bg(screen)
+                            game.show_last_move(screen)
+                            game.show_pieces(screen)
+                            
+                            game.next_turn()
+
+
+                    dragger.undrag_piece()
                 # quit event
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -74,9 +111,7 @@ class Main:
             pygame.display.update()
             clock.tick(60)
             
-            
-
-
+        
 main = Main()
 main.mainloop()
  

@@ -8,11 +8,31 @@ from move import Move
 class Board:
     def __init__(self):
        self.squares = [[0,0,0,0,0,0,0,0]for col in range(COLS)]
-
-    
+       self.last_move = None
        self._create()
        self._add_piece('white')
        self._add_piece('black')
+
+    def move(self,piece,move):
+        inital = move.inital
+        final = move.final
+
+        inital_row, inital_col = inital.row, inital.col
+        final_row, final_col = final.row, final.col
+
+        self.squares[inital_row][inital_col].piece = None
+        self.squares[final_row][final_col].piece = piece
+
+        piece.moved = True
+
+        piece.clear_moves()
+
+        self.last_move = move
+
+
+
+    def valid_move(self,piece,move):
+       return move in piece.moves
 
 
     def _create(self):
@@ -40,9 +60,9 @@ class Board:
         self.squares[row_other][7] = Square(row_other,7,Rook(color))
 
         # queen
-        self.squares[row_other][3] = Square(row_other,3,Queen(color))
+        self.squares[row_other][3] =   Square(row_other,3,Queen(color))
 
-        self.squares[5][0] = Square(5,0, King(color))
+        # self.squares[2][3] = Square(5,3, King(color))
 
         # king
         self.squares[row_other][4] = Square(row_other,4,King(color))
@@ -135,6 +155,8 @@ class Board:
                         move = Move(inital,final)
 
                         piece.add_move(move)
+
+            
 
             
 

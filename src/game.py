@@ -5,7 +5,9 @@ from dragger import Dragger
 
 class Game:
     def __init__(self):
+        self.next_player = 'white'
         self.board = Board()
+        self.hovered_square = None
         self.dragger = Dragger()
 
     # show methods
@@ -46,6 +48,39 @@ class Game:
                 rect = (move.final.col * SQSIZE, move.final.row * SQSIZE, SQSIZE,SQSIZE)
 
                 pygame.draw.rect(surface,color,rect)
-                    
+    
+    def next_turn(self):
+        self.next_player = 'white' if self.next_player == 'black' else 'black'
+
+    
+    def show_hover(self,surface):
+        if self.hovered_square:
+            row = self.hovered_square.row
+            col = self.hovered_square.col
+
+            color = '#C86464' if (row + col) % 2 == 0 else '#8C3F3F'
+
+            rect = (col * SQSIZE, row * SQSIZE, SQSIZE,SQSIZE)
+
+            pygame.draw.rect(surface,color,rect,width=3)
+
+    def set_hover(self,row,col):
+        self.hovered_square = self.board.squares[row][col]
+
+
+    def show_last_move(self,surface):
+        if self.board.last_move:
+            inital = self.board.last_move.inital
+            final = self.board.last_move.final
+
+            for pos in [inital,final]:
+                color = (244,247,116) if (pos.row + pos.col) % 2 == 0 else (172,195,51)
+
+                rect = (pos.col * SQSIZE, pos.row * SQSIZE, SQSIZE,SQSIZE)
+
+                pygame.draw.rect(surface,color,rect)
+
+    def reset(self):
+        self.__init__()
 
 
